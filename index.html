@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Judith und Phlipp kommen wieder ins Allgäu</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <style>
+      .free {background-color: #d4edda}
+      .occupied {background-color: #f8d7da}
+      body{  display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center;  padding-top: 90px; padding-bottom: 40px; background-color: #f5f5f5;}
+      #calendar {margin: auto}
+      #newEvent { width: 100%; max-width: 420px;}
+      
+    </style>
+  </head>
+  <body>
+    <div id="calendar">
+      <form id="newEvent" v-if="currentEvent == null">
+	<div class="form-group">
+	  <label for="evetnName">Name</label>
+	  <input v-model="newEvent.name" type="text" class="form-control"
+		 id="eventName" placeholder="Name your event.">
+	</div>
+	<div class="form-group">
+	  <label for="eventDescription">Description</label>
+	  <textarea v-model="newEvent.description" class="form-control"
+		    id="eventDescription" rows="3"
+		    placeholder="Describe your event."></textarea>
+	</div>
+
+	<div class="form-group">
+	  <label for="eventDescription">Proposed dates</label>
+	  <ul class="list-group" v-if="newEvent.proposals.length > 0">
+	    <li class="list-group-item" v-for="p in newEvent.proposals">{{p}}</li>
+	  </ul>
+	</div>
+
+	<div class="form-group">
+	  <div class="input-group mb-3">
+	  <input type="date" id="start" name="trip-start"
+		 value="2018-07-22"
+		 min="2018-01-01"
+		 class="form-control"
+		 aria-label="Propose date"
+		 v-model="newProposal"
+		 >
+	  <div class="input-group-append">
+	    <button class="btn btn-secondary" type="button" v-on:click="addProposal">Add</button>
+	  </div></div>
+	</div>
+
+	<button type="button" class="btn btn-primary" v-on:click="createEvent">
+	  Let the people vote for a date!
+	</button>
+      </form>
+      <div v-if="currentEvent != null">
+	<h1>{{currentEvent.name}}</h1>
+	<blockquote class="blockquote">
+	  <p class="mb-0">{{currentEvent.description}}</p>
+	</blockquote>
+      <table class="table">
+	<thead>
+	  <tr>
+	    <th scope="col">&nbsp;</th>
+	    <th v-for="p in currentEvent.proposals">{{new Date(p.appointment).toDateString()}}</th>
+	  </tr>
+	</thead>
+	<tbody>
+	  <tr v-for="p in currentEvent.attendees">
+	    <th scope="row">{{p.nick}}</th>
+	    <td v-for="d in currentEvent.proposals"
+		v-on:click="toggle(p, d.id)"
+		v-bind:class="{free: p.free.includes(d.id), occupied: p.occupied.includes(d.id)}"></td>
+	  </tr>
+	  <tr class="table-primary">
+	    <td>
+	      <div class="input-group mb-3">
+		<input v-model="newAttendee" type="text" class="form-control" placeholder="Your name" aria-label="Your username">
+		<div class="input-group-append">
+		  <button class="btn btn-secondary" type="button" v-on:click="add">Participate</button>
+		</div>
+	      </div>
+	    </td>
+	  </tr>
+	</tbody>
+      </table>
+      </div>
+    </div>
+    <script type="text/javascript">
+      var app3 = new Vue({
+	  el: '#calendar',
+	  data: {
+	      someother: false,
+	      newEvent: {
+		  name: "",
+		  description: "",
+		  proposals: [],
+	      },
+	      currentEvent: null,
+	      newAttendee: "",
+	      newProposal: null,
+	  },
+	  mounted() {
+	      if(window.location.href.endsWith('/')) {
+		  return
+	      }
+	      params = window.location.href.split('/')
+	      id = params[params.length - 1]
+	      console.log("fetchiung" + id)
+	      console.log('http://'+location.host)
+	      fetch('http://'+location.host + '/api/'+id, {
+		  method: 'GET',
+		  mode: 'cors', 
+		  cache: 'no-cache',
+		  credentials: 'same-origin',
+		  headers: {'Content-Type': 'application/json'},
+		  redirect: 'follow',
+		  referrerPolicy: 'no-referrer',
+	      }).then(d=>d.json()).then(c => this.currentEvent = c);
+	  },
+	  methods: {
+	      createEvent: function() {
+		  fetch('http://'+location.host + '/', {
+		      method: 'POST',
+		      mode: 'cors',
+		      cache: 'no-cache',
+		      credentials: 'same-origin',
+		      headers: { 'Content-Type': 'application/json' },
+		      redirect: 'follow',
+		      referrerPolicy: 'no-referrer',
+		      body: JSON.stringify(this.newEvent)
+		  }).then(d=>d.json()).then(c => {
+		      this.currentEvent = c;
+		      history.pushState({urlPath: c.id}, "", c.id)
+		  })
+	      },
+	      addProposal: function() {
+		  const target = new Date(this.newProposal)
+		  if(!this.newEvent.proposals.includes(target)) {
+		      this.newEvent.proposals.push(target)
+		  }
+	      },
+	      add: function() {
+		  var target = {'nick': this.newAttendee, 'free': [], 'occupied':[]}
+		  fetch('http://'+location.host + '/api/'+this.currentEvent.id+'/attendee', {
+		      method: 'POST',
+		      mode: 'cors',
+		      cache: 'no-cache',
+		      credentials: 'same-origin',
+		      headers: { 'Content-Type': 'application/json' },
+		      redirect: 'follow',
+		      referrerPolicy: 'no-referrer',
+		      body: JSON.stringify(target)
+		  }).then(d=>d.json()).then(c => {
+		      target = c
+		      this.currentEvent.attendees.push(target)
+		  })
+	      },
+	      toggle: function(attendee, date) {
+		  if(attendee.free.includes(date)) {
+		      attendee.occupied.push(date)
+		      attendee.free.splice(attendee.free.indexOf(date), 1)
+		  } else if (attendee.occupied.includes(date)) {
+		      attendee.free.push(date)
+		      attendee.occupied.splice(attendee.occupied.indexOf(date), 1)
+		  } else {
+		      attendee.free.push(date)
+		  }
+
+		  fetch('http://'+location.host + '/api/'+this.currentEvent.id+'/attendee/'+attendee.id, {
+		      method: 'PUT',
+		      mode: 'cors',
+		      cache: 'no-cache',
+		      credentials: 'same-origin',
+		      headers: { 'Content-Type': 'application/json' },
+		      redirect: 'follow',
+		      referrerPolicy: 'no-referrer',
+		      body: JSON.stringify(attendee)
+		  })
+	      }
+	  }
+      })
+    </script>
+
+  </body>
+</html>
