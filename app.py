@@ -91,7 +91,7 @@ def api_event(event_id):
     return (json.dumps(serialise_event(target_event)), 200)
 
 
-@app.route("/all", methods=['GET'])
+@app.route("/api/all", methods=['GET'])
 def all():
     return jsonify([serialise_event(e) for e in Event.query.all()], 200)
 
@@ -128,7 +128,7 @@ def update_attendee(event_id, attendee_id):
     return (json.dumps(serialise_attendee(a)), 200)
 
 
-@app.route("/", methods=['POST'])
+@app.route("/api", methods=['POST'])
 def create():
     params = request.json
 
