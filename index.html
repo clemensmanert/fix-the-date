@@ -108,7 +108,7 @@
 	      }
 	      params = window.location.href.split('/')
 	      id = params[params.length - 1]
-	      fetch(location.protocol+'//'+location.host + '/api/'+id, {
+	      fetch(location.protocol+'//'+location.host+location.pathname+'/api/'+id, {
 		  method: 'GET',
 		  mode: 'cors', 
 		  cache: 'no-cache',
@@ -120,7 +120,7 @@
 	  },
 	  methods: {
 	      createEvent: function() {
-		  fetch(location.protocol+'//'+location.host+'/', {
+		  fetch(location.protocol+'//'+location.host+location.pathname+'/', {
 		      method: 'POST',
 		      mode: 'cors',
 		      cache: 'no-cache',
@@ -142,7 +142,7 @@
 	      },
 	      add: function() {
 		  var target = {'nick': this.newAttendee, 'free': [], 'occupied':[]}
-		  fetch(location.protocol+'//'+location.host+'/api/'+this.currentEvent.id+'/attendee', {
+		  fetch(location.protocol+'//'+location.host+location.pathname+'/api/'+this.currentEvent.id+'/attendee', {
 		      method: 'POST',
 		      mode: 'cors',
 		      cache: 'no-cache',
@@ -167,7 +167,7 @@
 		      attendee.free.push(date)
 		  }
 
-		  fetch(location.protocol+'//'+location.host+'/api/'+this.currentEvent.id+'/attendee/'+attendee.id, {
+		  fetch(location.protocol+'//'+location.host+location.pathname+'/api/'+this.currentEvent.id+'/attendee/'+attendee.id, {
 		      method: 'PUT',
 		      mode: 'cors',
 		      cache: 'no-cache',
