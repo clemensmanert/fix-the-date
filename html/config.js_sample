@@ -1,1 +1,1 @@
-BACKEND_URL = new URL('http://localhost:5000/api')
+BACKEND_URL = new URL('http://localhost:5000')
