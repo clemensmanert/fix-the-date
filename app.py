@@ -9,6 +9,7 @@ from datetime import datetime
 app = Flask(__name__, static_folder='html')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
@@ -75,10 +76,17 @@ def serialise_event(target):
         'attendees': [serialise_attendee(a) for a in target.attendees],
     }
 
-
 @app.route("/", methods=['GET'])
 def home():
     return app.send_static_file('index.html')
+
+@app.route("/config.js", methods=['GET'])
+def send_frontend_config():
+    return app.send_static_file('config.js')
+
+@app.route("/favicon.icon", methods=['GET'])
+def send_frontend_favicon():
+    return (200)
 
 
 @app.route("/<event_id>", methods=['GET'])
@@ -97,7 +105,7 @@ def all():
 
 @app.route("/api/<event_id>/attendee", methods=['POST'])
 def create_attendee(event_id):
-    params = request.json
+    params = request.get_json()
 
     if not 'nick' in params:
         return Errors.EMPTY_NICK
@@ -109,9 +117,8 @@ def create_attendee(event_id):
 
 @app.route("/api/<event_id>/attendee/<attendee_id>", methods=['PUT'])
 def update_attendee(event_id, attendee_id):
-    params = request.json
-    print("heey")
-    print(params)
+    params = request.get_json()
+
     a = Attendee.query.get(attendee_id)
 
     a.free.clear()
@@ -128,17 +135,15 @@ def update_attendee(event_id, attendee_id):
     return (json.dumps(serialise_attendee(a)), 200)
 
 
-@app.route("/api", methods=['POST'])
+@app.route("/api/", methods=['POST'])
 def create():
-    params = request.json
+    params = request.get_json()
 
     if not 'name' in params:
         return Errors.EMPTY_NAME
 
     if not 'description' in params:
         return Errors.EMPTY_DESCRIPTION
-
-    print(params)
 
     e = Event(name=params['name'],
               description=params['description'],
