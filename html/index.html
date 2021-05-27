@@ -83,18 +83,29 @@
 	</thead>
 	<tbody>
 	  <tr v-for="p in currentEvent.attendees">
-	    <th scope="row">{{p.nick}}</th>
+	    <th scope="row"
+		v-bind:class="{'table-danger': duplicateAttendee == p.nick}">
+	      {{p.nick}}
+	    </th>
 	    <td v-for="d in currentEvent.proposals"
 		v-on:click="toggle(p, d.id)"
 		v-bind:class="{free: p.free.includes(d.id), occupied: p.occupied.includes(d.id)}"></td>
 	  </tr>
 	  <tr class="table-primary">
 	    <td>
-	      <div class="input-group mb-3">
-		<input v-model="newAttendee" type="text" class="form-control" placeholder="Your name" aria-label="Your username">
-		<div class="input-group-append">
+		<small id="newAttendeeEmpty" class="text-danger error">
+		Provide your name to attend choose a date.
+		</small><small id="newAttendeeDuplicate" class="text-danger error">
+		Someone with this name is already there, choose a different name.
+		</small>
+		<div class="input-group mb-3">
+		  <input v-model="newAttendee"
+			 id="newAttendeeInput"
+			 type="text"
+			 class="form-control"
+			 placeholder="Your name"
+			 aria-label="Your name">
 		  <button class="btn btn-secondary" type="button" v-on:click="add">Participate</button>
-		</div>
 	      </div>
 	    </td>
 	  </tr>
@@ -136,6 +147,7 @@
 	      newAttendee: "",
 	      newProposal: null,
 	      duplicateProposal: null,
+	      duplicateAttendee: null,
 	  },
 	  mounted() {
 	      if(window.location.href.endsWith('/')) {
@@ -186,6 +198,23 @@
 		  }
 	      },
 	      add: function() {
+		  newAttendeeEmpty.style.visibility = 'collapse';
+		  newAttendeeDuplicate.style.visibility = 'collapse';
+		  newAttendeeInput.classList.remove("is-invalid");
+
+		  if(!this.newAttendee && this.newAttendee.length == 0) {
+		      newAttendeeEmpty.style.visibility = 'visible';
+		      newAttendeeInput.classList.add("is-invalid");
+		      return;
+		  }
+
+		  if(this.currentEvent.attendees.map(a => a.nick).includes(this.newAttendee)) {
+		      newAttendeeDuplicate.style.visibility = 'visible';
+		      newAttendeeInput.classList.add("is-invalid");
+		      this.duplicateAttendee = this.newAttendee;
+		      return;
+		  }
+
 		  var target = {'nick': this.newAttendee, 'free': [], 'occupied':[]}
 		  post_api(this.currentEvent.id + '/attendee', JSON.stringify(target))
 		      .then(d => d.json())

@@ -19,6 +19,7 @@ class Errors(Enum):
     EMPTY_DESCRIPTION = 'A description is required.'
     EMPTY_NICK = 'A nick is required to create an attendee.'
     TOO_FEW_PROPOSALS = 'Too view proposals for provided.'
+    DUPLICATE_NICK = 'This nick name is already present at this event.'
     UNKNOWN = 'unknown'
 
 
@@ -108,8 +109,11 @@ def all():
 def create_attendee(event_id):
     params = request.get_json()
 
-    if not 'nick' in params:
+    if not 'nick' in params or len(params['nick']) < 1:
         return (Errors.EMPTY_NICK.value, 400)
+
+    if any(Attendee.query.filter_by(nick=params['nick'])):
+        return (Errors.DUPLICATE_NICK.value, 400)
 
     a = Attendee(nick=params['nick'], event_id=event_id)
     db.session.add(a)
