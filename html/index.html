@@ -38,15 +38,18 @@
 	  <small id="eventProposalsTooFew" class="text-danger error">
 	    Provide at least to different dates people can choose from.
 	  </small>
-
-	  <ul class="list-group" v-if="newEvent.proposals.length > 0">
-	    <li class="list-group-item" v-for="p in newEvent.proposals">
+	  <ul id="proposedDates" class="list-group" v-if="newEvent.proposals.length > 0">
+	    <li class="list-group-item"
+		v-for="p in newEvent.proposals"
+		v-bind:class="{'list-group-item-warning': duplicateProposal != null
+			      && duplicateProposal == p.getTime()}">
 	      {{p.toLocaleDateString()}}
 	    </li>
 	  </ul>
 	</div>
 
 	<div class="form-group">
+	  <small id="duplicateProposal" class="text-danger error">The proposal is already there</small>
 	  <div class="input-group mb-3">
 	    <input type="date"
 		   name="trip-start"
@@ -132,6 +135,7 @@
 	      currentEvent: null,
 	      newAttendee: "",
 	      newProposal: null,
+	      duplicateProposal: null,
 	  },
 	  mounted() {
 	      if(window.location.href.endsWith('/')) {
@@ -171,9 +175,14 @@
 		      })
 	      },
 	      addProposal: function() {
-		  const target = new Date(this.newProposal)
-		  if(!this.newEvent.proposals.includes(target)) {
-		      this.newEvent.proposals.push(target)
+		  const target = new Date(this.newProposal);
+		  if(!this.newEvent.proposals.map(d => d.getTime()).includes(target.getTime())) {
+		      this.newEvent.proposals.push(target);
+		      this.duplicateProposal = null;
+		      duplicateProposal.style.visibility = 'collapse';
+		  } else {
+		      duplicateProposal.style.visibility = 'visible';
+		      this.duplicateProposal = target.getTime();
 		  }
 	      },
 	      add: function() {
