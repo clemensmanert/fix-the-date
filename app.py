@@ -18,6 +18,7 @@ class Errors(Enum):
     EMPTY_NAME = 'A name is required.'
     EMPTY_DESCRIPTION = 'A description is required.'
     EMPTY_NICK = 'A nick is required to create an attendee.'
+    TOO_FEW_PROPOSALS = 'Too view proposals for provided.'
     UNKNOWN = 'unknown'
 
 
@@ -139,11 +140,14 @@ def update_attendee(event_id, attendee_id):
 def create():
     params = request.get_json()
 
-    if not 'name' in params:
+    if not 'name' in params or len(params['name']) == 0:
         return Errors.EMPTY_NAME
 
     if not 'description' in params:
         return Errors.EMPTY_DESCRIPTION
+
+    if not 'proposals' in params or len(params['proposals']) < 2:
+        return Errors.TOO_FEW_PROPOSALS
 
     e = Event(name=params['name'],
               description=params['description'],

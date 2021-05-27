@@ -12,13 +12,17 @@
       body{  display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center;  padding-top: 90px; padding-bottom: 40px; background-color: #f5f5f5;}
       #calendar {margin: auto}
       #newEvent { width: 100%; max-width: 420px;}
+      small.error { visibility: collapse; }
     </style>
   </head>
   <body>
     <div id="calendar">
-      <form id="newEvent" v-if="currentEvent == null">
+      <form @submit="createEvent" v-if="currentEvent == null" >
 	<div class="form-group">
-	  <label for="evetnName">Name</label>
+	  <label for="eventName">Name</label>
+	  <small id="eventNameErrorMissing" class="text-danger error">
+	    Provide a name for your event.
+	  </small>
 	  <input v-model="newEvent.name" type="text" class="form-control"
 		 id="eventName" placeholder="Name your event.">
 	</div>
@@ -31,6 +35,10 @@
 
 	<div class="form-group">
 	  <label for="eventDescription">Proposed dates</label>
+	  <small id="eventProposalsTooFew" class="text-danger error">
+	    Provide at least to different dates people can choose from.
+	  </small>
+
 	  <ul class="list-group" v-if="newEvent.proposals.length > 0">
 	    <li class="list-group-item" v-for="p in newEvent.proposals">{{p}}</li>
 	  </ul>
@@ -38,19 +46,21 @@
 
 	<div class="form-group">
 	  <div class="input-group mb-3">
-	  <input type="date" id="start" name="trip-start"
-		 value="2018-07-22"
-		 min="2018-01-01"
-		 class="form-control"
-		 aria-label="Propose date"
-		 v-model="newProposal"
-		 >
+	    <input type="date"
+		   name="trip-start"
+		   id="dateFieldInput"
+		   value="2018-07-22"
+		   min="2018-01-01"
+		   class="form-control"
+		   aria-label="Propose date"
+		   v-model="newProposal"
+		   >
 	  <div class="input-group-append">
 	    <button class="btn btn-secondary" type="button" v-on:click="addProposal">Add</button>
 	  </div></div>
 	</div>
 
-	<button type="button" class="btn btn-primary" v-on:click="createEvent">
+	<button type="submit" class="btn btn-primary">
 	  Let the people vote for a date!
 	</button>
       </form>
@@ -130,7 +140,27 @@
 	      api_call(id).then(d=>d.json()).then(c => this.currentEvent = c);
 	  },
 	  methods: {
-	      createEvent: function() {
+	      createEvent: function(e) {
+		  e.preventDefault();
+
+		  eventName.classList.remove("is-invalid");
+		  dateFieldInput.classList.remove("is-invalid");
+
+		  eventNameErrorMissing.style.visibility = "collapse";
+		  eventProposalsTooFew.style.visibility = "collapse";
+
+		  if(! this.newEvent.name || this.newEvent.name.length === 0) {
+		      eventNameErrorMissing.style.visibility = "visible"
+		      eventName.classList.add("is-invalid");
+		      return;
+		  }
+
+		  if(this.newEvent.proposals.length < 2) {
+		      eventProposalsTooFew.style.visibility = "visible"
+		      dateFieldInput.classList.add("is-invalid");
+		      return;
+		  }
+
 		  post_api('', JSON.stringify(this.newEvent))
 		      .then(d => d.json())
 		      .then(c => {
