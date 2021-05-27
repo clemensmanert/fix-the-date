@@ -109,7 +109,7 @@ def create_attendee(event_id):
     params = request.get_json()
 
     if not 'nick' in params:
-        return Errors.EMPTY_NICK
+        return (Errors.EMPTY_NICK.value, 400)
 
     a = Attendee(nick=params['nick'], event_id=event_id)
     db.session.add(a)
@@ -141,13 +141,13 @@ def create():
     params = request.get_json()
 
     if not 'name' in params or len(params['name']) == 0:
-        return Errors.EMPTY_NAME
+        return (Errors.EMPTY_NAME.value, 400)
 
     if not 'description' in params:
-        return Errors.EMPTY_DESCRIPTION
+        return (Errors.EMPTY_DESCRIPTION.value, 400)
 
     if not 'proposals' in params or len(params['proposals']) < 2:
-        return Errors.TOO_FEW_PROPOSALS
+        return (Errors.TOO_FEW_PROPOSALS.value, 400)
 
     e = Event(name=params['name'],
               description=params['description'],
