@@ -40,7 +40,9 @@
 	  </small>
 
 	  <ul class="list-group" v-if="newEvent.proposals.length > 0">
-	    <li class="list-group-item" v-for="p in newEvent.proposals">{{p}}</li>
+	    <li class="list-group-item" v-for="p in newEvent.proposals">
+	      {{p.toLocaleDateString()}}
+	    </li>
 	  </ul>
 	</div>
 
