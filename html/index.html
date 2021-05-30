@@ -97,7 +97,11 @@
 	    </th>
 	    <td v-for="d in currentEvent.proposals"
 		v-on:click="toggle(p, d.id)"
-		v-bind:class="{free: p.free.includes(d.id), occupied: p.occupied.includes(d.id)}"></td>
+		v-bind:class="{free: p.free.includes(d.id), occupied: p.occupied.includes(d.id)}">
+	      <i v-if="p.free.includes(d.id)" class="bi bi-check"></i>
+	      <i v-else-if="p.occupied.includes(d.id)" class="bi bi-x"></i>
+	      <i v-else class="bi bi-question"></i>
+	    </td>
 	  </tr>
 	  <tr class="table-primary">
 	    <td>
