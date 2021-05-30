@@ -112,7 +112,7 @@ def create_attendee(event_id):
     if not 'nick' in params or len(params['nick']) < 1:
         return (Errors.EMPTY_NICK.value, 400)
 
-    if any(Attendee.query.filter_by(nick=params['nick'])):
+    if any(Attendee.query.filter_by(nick=params['nick'], event_id=event_id)):
         return (Errors.DUPLICATE_NICK.value, 400)
 
     a = Attendee(nick=params['nick'], event_id=event_id)
