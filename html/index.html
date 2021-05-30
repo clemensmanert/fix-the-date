@@ -34,12 +34,12 @@
 		    placeholder="Describe your event."></textarea>
 	</div>
 
-	<div class="form-group">
+	<div class="form-group" v-if="newEvent.proposals.length > 0">
 	  <label for="eventDescription">Proposed dates</label>
 	  <small id="eventProposalsTooFew" class="text-danger error">
 	    Provide at least to different dates people can choose from.
 	  </small>
-	  <ul id="proposedDates" class="list-group" v-if="newEvent.proposals.length > 0">
+	  <ul id="proposedDates" class="list-group">
 	    <li class="list-group-item d-flex justify-content-between align-items-center"
 		v-for="p in newEvent.proposals"
 		v-bind:class="{'list-group-item-warning': duplicateProposal != null
