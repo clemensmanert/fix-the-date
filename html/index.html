@@ -108,6 +108,7 @@
 		</small>
 		<div class="input-group mb-3">
 		  <input v-model="newAttendee"
+			 v-on:keyup.enter="add"
 			 id="newAttendeeInput"
 			 type="text"
 			 class="form-control"
@@ -233,6 +234,7 @@
 		      .then(c => {
 			  target = c
 			  this.currentEvent.attendees.push(target)
+			  this.newAttendee = '';
 		      })
 	      },
 	      toggle: function(attendee, date) {
