@@ -85,16 +85,20 @@
       <table class="table">
 	<thead>
 	  <tr>
-	    <th scope="col">&nbsp;</th>
-	    <th v-for="p in currentEvent.proposals">{{new Date(p.appointment).toDateString()}}</th>
+	    <th scope="col"><h2>People</h2></th>
+	    <th v-for="p in currentEvent.proposals">
+	      {{new Date(p.appointment).toLocaleDateString()}}
+	      <br>
+	      {{new Date(p.appointment).toLocaleString(language, {weekday: 'long'})}}
+	    </th>
 	  </tr>
 	</thead>
 	<tbody>
 	  <tr v-for="p in currentEvent.attendees">
-	    <th scope="row"
+	    <td scope="row"
 		v-bind:class="{'table-danger': duplicateAttendee == p.nick}">
 	      {{p.nick}}
-	    </th>
+	    </td>
 	    <td v-for="d in currentEvent.proposals"
 		v-on:click="toggle(p, d.id)"
 		v-bind:class="{free: p.free.includes(d.id), occupied: p.occupied.includes(d.id)}">
@@ -161,6 +165,7 @@
 	      newProposal: null,
 	      duplicateProposal: null,
 	      duplicateAttendee: null,
+	      language: window.navigator.language
 	  },
 	  mounted() {
 	      if(window.location.href.endsWith('/')) {
