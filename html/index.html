@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Judith und Phlipp kommen wieder ins Allgäu</title>
+    <title>Fix the date for an event</title>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="config.js"></script>
     <meta charset="UTF-8">
@@ -173,7 +173,10 @@
 	      }
 	      params = window.location.href.split('/')
 	      id = params[params.length - 1]
-	      api_call(id).then(d=>d.json()).then(c => this.currentEvent = c);
+	      api_call(id).then(d=>d.json()).then(c => {
+		  this.currentEvent = c;
+		  document.title = c.name;
+	      });
 	  },
 	  methods: {
 	      createEvent: function(e) {
@@ -201,7 +204,8 @@
 		      .then(d => d.json())
 		      .then(c => {
 			  this.currentEvent = c;
-			  history.pushState({urlPath: c.id}, "", c.id)
+			  history.pushState({urlPath: c.id}, c.name, c.id);
+			  document.title = c.name;
 		      })
 	      },
 	      addProposal: function() {
