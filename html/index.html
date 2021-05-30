@@ -59,14 +59,17 @@
 	    <input type="date"
 		   name="trip-start"
 		   id="dateFieldInput"
-		   value="2018-07-22"
-		   min="2018-01-01"
 		   class="form-control"
 		   aria-label="Propose date"
 		   v-model="newProposal"
 		   >
 	  <div class="input-group-append">
-	    <button class="btn btn-secondary" type="button" v-on:click="addProposal"><i class="bi bi-plus-lg"></i></button>
+	    <button class="btn btn-s btn-primary"
+		    type="button"
+		    v-on:click="addProposal"
+		    v-if="newProposal">
+	      <i class="bi bi-plus-lg"></i>
+	    </button>
 	  </div></div>
 	</div>
 
@@ -139,7 +142,7 @@
       function post_api(url, body) { return api_call(url, 'POST', body); }
       function put_api(url, body)  { return api_call(url, 'PUT', body); }
 
-      var app3 = new Vue({
+      var app = new Vue({
 	  el: '#calendar',
 	  data: {
 	      someother: false,
