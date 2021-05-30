@@ -5,6 +5,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="config.js"></script>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <style>
       .free {background-color: #d4edda}
@@ -39,11 +40,14 @@
 	    Provide at least to different dates people can choose from.
 	  </small>
 	  <ul id="proposedDates" class="list-group" v-if="newEvent.proposals.length > 0">
-	    <li class="list-group-item"
+	    <li class="list-group-item d-flex justify-content-between align-items-center"
 		v-for="p in newEvent.proposals"
 		v-bind:class="{'list-group-item-warning': duplicateProposal != null
 			      && duplicateProposal == p.getTime()}">
 	      {{p.toLocaleDateString()}}
+	      <span class="badge">
+	        <i class="bi bi-trash" v-on:click="removeProposal(p)"></i>
+	      </span>
 	    </li>
 	  </ul>
 	</div>
@@ -196,6 +200,9 @@
 		      duplicateProposal.style.visibility = 'visible';
 		      this.duplicateProposal = target.getTime();
 		  }
+	      },
+	      removeProposal: function(proposal) {
+		  this.newEvent.proposals = this.newEvent.proposals.filter(p => p.getTime() != proposal.getTime())
 	      },
 	      add: function() {
 		  newAttendeeEmpty.style.visibility = 'collapse';
