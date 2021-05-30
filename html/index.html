@@ -198,6 +198,7 @@
 		  const target = new Date(this.newProposal);
 		  if(!this.newEvent.proposals.map(d => d.getTime()).includes(target.getTime())) {
 		      this.newEvent.proposals.push(target);
+		      this.newEvent.proposals.sort((lhs, rhs) => lhs.getTime() > rhs.getTime())
 		      this.duplicateProposal = null;
 		      duplicateProposal.style.visibility = 'collapse';
 		  } else {
