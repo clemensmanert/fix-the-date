@@ -204,7 +204,7 @@
 		      .then(d => d.json())
 		      .then(c => {
 			  this.currentEvent = c;
-			  history.pushState({urlPath: c.id}, c.name, c.id);
+			  history.pushState({urlPath: c.key}, c.name, c.key);
 			  document.title = c.name;
 		      })
 	      },
@@ -242,7 +242,7 @@
 		  }
 
 		  var target = {'nick': this.newAttendee, 'free': [], 'occupied':[]}
-		  post_api(this.currentEvent.id + '/attendee', JSON.stringify(target))
+		  post_api(this.currentEvent.key + '/attendee', JSON.stringify(target))
 		      .then(d => d.json())
 		      .then(c => {
 			  target = c
@@ -261,7 +261,7 @@
 		      attendee.free.push(date)
 		  }
 
-		  put_api(this.currentEvent.id + '/attendee/' + attendee.id,
+		  put_api(this.currentEvent.key + '/attendee/' + attendee.id,
 			  JSON.stringify(attendee))
 	      }
 	  }
