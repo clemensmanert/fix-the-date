@@ -107,7 +107,8 @@
 	      <i v-else class="bi bi-question"></i>
 	    </td>
 	  </tr>
-	  <tr class="table-primary">
+	  <tr class="table-primary"
+	      v-if='!currentEvent.attendees.map(a => a.nick).includes(userName)'>
 	    <td>
 		<small id="newAttendeeEmpty" class="text-danger error">
 		Provide your name to attend choose a date.
@@ -162,17 +163,20 @@
 	      },
 	      currentEvent: null,
 	      newAttendee: "",
+	      userName: '',
 	      newProposal: null,
 	      duplicateProposal: null,
 	      duplicateAttendee: null,
 	      language: window.navigator.language
 	  },
+
 	  mounted() {
 	      if(window.location.href.endsWith('/')) {
 		  return
 	      }
 	      params = window.location.href.split('/')
 	      id = params[params.length - 1]
+	      this.userName = document.cookie;
 	      api_call(id).then(d=>d.json()).then(c => {
 		  this.currentEvent = c;
 		  document.title = c.name;
@@ -248,11 +252,13 @@
 			  target = c
 			  this.currentEvent.attendees.push(target)
 			  document.cookie = this.newAttendee;
+			  this.userName = this.newAttendee;
 			  this.newAttendee = '';
+
 		      })
 	      },
 	      toggle: function(attendee, date) {
-		  if( document.cookie != attendee.nick) { return; }
+		  if( this.userName != attendee.nick) { return; }
 
 		  if(attendee.free.includes(date)) {
 		      attendee.occupied.push(date)
