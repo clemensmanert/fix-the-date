@@ -247,10 +247,13 @@
 		      .then(c => {
 			  target = c
 			  this.currentEvent.attendees.push(target)
+			  document.cookie = this.newAttendee;
 			  this.newAttendee = '';
 		      })
 	      },
 	      toggle: function(attendee, date) {
+		  if( document.cookie != attendee.nick) { return; }
+
 		  if(attendee.free.includes(date)) {
 		      attendee.occupied.push(date)
 		      attendee.free.splice(attendee.free.indexOf(date), 1)
