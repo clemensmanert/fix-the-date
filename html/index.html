@@ -96,7 +96,7 @@
 	<tbody>
 	  <tr v-for="p in currentEvent.attendees">
 	    <td scope="row"
-		v-bind:class="{'table-danger': duplicateAttendee == p.nick}">
+		v-bind:class="{'table-danger': duplicateAttendee == p.nick, 'table-primary': p.nick == userName}">
 	      {{p.nick}}
 	    </td>
 	    <td v-for="d in currentEvent.proposals"
