@@ -13,7 +13,6 @@
       body{  display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center;  padding-top: 90px; padding-bottom: 40px; background-color: #f5f5f5;}
       #calendar {margin: auto}
       #newEvent { width: 100%; max-width: 420px;}
-      small.error { visibility: collapse; }
       h1 { font-size: 8vh; }
       h2 { font-size: 5vh; }
       th, td { font-size: 4vh; }
@@ -24,9 +23,7 @@
       <form @submit="createEvent" v-if="currentEvent == null" >
 	<div class="form-group">
 	  <label for="eventName">Name</label>
-	  <small id="eventNameErrorMissing" class="text-danger error">
-	    Provide a name for your event.
-	  </small>
+	  <small class="text-danger error">{{eventNameError}}</small>
 	  <input v-model="newEvent.name" type="text" class="form-control"
 		 id="eventName" placeholder="Name your event.">
 	</div>
@@ -39,9 +36,7 @@
 
 	<div class="form-group" v-if="newEvent.proposals.length > 0">
 	  <label for="eventDescription">Proposed dates</label>
-	  <small id="eventProposalsTooFew" class="text-danger error">
-	    Provide at least to different dates people can choose from.
-	  </small>
+	  <small class="text-danger error">{{eventDateError}}</small>
 	  <ul id="proposedDates" class="list-group">
 	    <li class="list-group-item d-flex justify-content-between align-items-center"
 		v-for="p in newEvent.proposals"
@@ -57,7 +52,7 @@
 
 	<div class="form-group">
 	  <label for="dateFieldInput">Choose some dates others can pick</label>
-	  <small id="duplicateProposal" class="text-danger error">The proposal is already there</small>
+	  <small class="text-danger error">{{duplicateProposalError}}</small>
 	  <div class="input-group mb-3">
 	    <input type="date"
 		   name="trip-start"
@@ -113,11 +108,6 @@
 	  <tr class="table-primary"
 	      v-if='!currentEvent.attendees.map(a => a.nick).includes(userName)'>
 	    <td>
-		<small id="newAttendeeEmpty" class="text-danger error">
-		Provide your name to attend choose a date.
-		</small><small id="newAttendeeDuplicate" class="text-danger error">
-		Someone with this name is already there, choose a different name.
-		</small>
 		<div class="input-group mb-3">
 		  <input v-model="newAttendee"
 			 v-on:keyup.enter="add"
@@ -127,6 +117,7 @@
 			 placeholder="Your name"
 			 aria-label="Your name">
 		  <button class="btn btn-secondary" type="button" v-on:click="add">Participate</button>
+	      <small class="text-danger error">{{participantError}}</small>
 	      </div>
 	    </td>
 	  </tr>
@@ -170,7 +161,11 @@
 	      newProposal: null,
 	      duplicateProposal: null,
 	      duplicateAttendee: null,
-	      language: window.navigator.language
+	      language: window.navigator.language,
+	      eventNameError: '',
+	      eventDateError: '',
+	      participantError: '',
+	      duplicateProposalError: '',	      
 	  },
 
 	  mounted() {
@@ -192,17 +187,16 @@
 		  eventName.classList.remove("is-invalid");
 		  dateFieldInput.classList.remove("is-invalid");
 
-		  eventNameErrorMissing.style.visibility = "collapse";
-		  eventProposalsTooFew.style.visibility = "collapse";
+		  this.eventNameError = '';
+		  this.eventDateError = '';
 
 		  if(! this.newEvent.name || this.newEvent.name.length === 0) {
-		      eventNameErrorMissing.style.visibility = "visible"
-		      eventName.classList.add("is-invalid");
+		      this.eventNameError = 'Provide a name for your event.';
 		      return;
 		  }
 
 		  if(this.newEvent.proposals.length < 2) {
-		      eventProposalsTooFew.style.visibility = "visible"
+		      this.eventDateError = 'Provide at least two different dates people can choose from.';
 		      dateFieldInput.classList.add("is-invalid");
 		      return;
 		  }
@@ -221,9 +215,9 @@
 		      this.newEvent.proposals.push(target);
 		      this.newEvent.proposals.sort((lhs, rhs) => lhs.getTime() > rhs.getTime())
 		      this.duplicateProposal = null;
-		      duplicateProposal.style.visibility = 'collapse';
+		      this.duplicateProposalError = '';
 		  } else {
-		      duplicateProposal.style.visibility = 'visible';
+		      this.duplicateProposalError = 'The proposal is already there.';
 		      this.duplicateProposal = target.getTime();
 		  }
 	      },
@@ -231,19 +225,15 @@
 		  this.newEvent.proposals = this.newEvent.proposals.filter(p => p.getTime() != proposal.getTime())
 	      },
 	      add: function() {
-		  newAttendeeEmpty.style.visibility = 'collapse';
-		  newAttendeeDuplicate.style.visibility = 'collapse';
-		  newAttendeeInput.classList.remove("is-invalid");
-
+		  this.participantError = '';		      
+		  
 		  if(!this.newAttendee && this.newAttendee.length == 0) {
-		      newAttendeeEmpty.style.visibility = 'visible';
-		      newAttendeeInput.classList.add("is-invalid");
+		      this.participantError = 'Provide your name to attend choose a date.';				
 		      return;
 		  }
 
 		  if(this.currentEvent.attendees.map(a => a.nick).includes(this.newAttendee)) {
-		      newAttendeeDuplicate.style.visibility = 'visible';
-		      newAttendeeInput.classList.add("is-invalid");
+		      this.participantError = "Someone with this name is already there, choose a different name.";		    
 		      this.duplicateAttendee = this.newAttendee;
 		      return;
 		  }
@@ -275,7 +265,7 @@
 
 		  put_api(this.currentEvent.key + '/attendee/' + attendee.id,
 			  JSON.stringify(attendee))
-	      }
+	    }
 	  }
       })
     </script>
