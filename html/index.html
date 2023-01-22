@@ -10,6 +10,10 @@
     <style>
       * { font-size: 4vh; }
       body { display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center; }
+      @media (pointer:coarse) {
+        body { -ms-flex-align: left; align-items: left; }
+        newAttendee { width: 100% }
+      }
       td.free     { background-color: var( --bs-success-bg-subtle ) }
       td.occupied { background-color: var( --bs-danger-bg-subtle ) }
       tr.you { background-color: var(--bs-primary) }
@@ -110,7 +114,7 @@
 	      v-if='!currentEvent.attendees.map(a => a.nick).includes(userName)'>
 	    <td :colspan="currentEvent.proposals.length + 1">
 	      <small class="text-danger error">{{participantError}}</small>
-	      <div class="input-group mb-3">
+	      <div class="input-group mb-3 newAttendee">
 		<input v-model="newAttendee"
 		       v-on:keyup.enter="add"
 		       id="newAttendeeInput"
