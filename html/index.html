@@ -48,9 +48,9 @@
 		v-bind:class="{'list-group-item-warning': duplicateProposal != null
 			      && duplicateProposal == p.getTime()}">
 	      {{p.toLocaleDateString()}}
-	      <span class="badge">
-	        <i class="bi bi-trash" v-on:click="removeProposal(p)"></i>
-	      </span>
+	      <button type="button" class="btn btn-outline-secondary" v-on:click="removeProposal(p)">
+	        <i class="bi bi-trash-fill"></i>
+	      </button>
 	    </li>
 	  </ul>
 	</div>
