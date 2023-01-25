@@ -263,7 +263,6 @@
 		      attendee.occupied.push(date)
 		      attendee.free.splice(attendee.free.indexOf(date), 1)
 		  } else if (attendee.occupied.includes(date)) {
-		      attendee.free.push(date)
 		      attendee.occupied.splice(attendee.occupied.indexOf(date), 1)
 		  } else {
 		      attendee.free.push(date)
