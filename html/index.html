@@ -14,6 +14,7 @@
         body { -ms-flex-align: left; align-items: left; }
         newAttendee { width: 100% }
       }
+      .current-event-description { white-space: pre; }
       td.free     { background-color: var( --bs-success-bg-subtle ) }
       td.occupied { background-color: var( --bs-danger-bg-subtle ) }
       tr.you { background-color: var(--bs-primary) }
@@ -83,7 +84,7 @@
       <div v-if="currentEvent != null">
 	<h1>{{currentEvent.name}}</h1>
 	<blockquote class="blockquote">
-	  <p class="mb-0">{{currentEvent.description}}</p>
+	  <p class="mb-0 current-event-description">{{currentEvent.description}}</p>
 	</blockquote>
       <table class="table">
 	<thead>
